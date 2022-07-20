@@ -12,5 +12,16 @@ export const sign_in_page = {
     signup_link: '[href="/signup"]',
     built_by: '.MuiTypography-body2',
     copyright_logo: '[viewBox="0 0 403 135"]',
-    copyright_link: '[href="https://cypress.io"]'
+    copyright_link: '[href="https://cypress.io"]',
+    first_name: '#firstName',
+    last_name: '#lastName',
+    username: '#username',
+    user_password: '#password',
+    confirm_password: '#confirmPassword',
+    sign_up_button: '.MuiButton-label',
+    user_test_data: 'UserTestData',
+    password_for_test: 'UserPassword',
+    user_login_check: '.MuiTypography-subtitle1',
+    confirmation_modal: '.MuiDialogContentText-root',
+    logout_button: '[data-test="sidenav-signout"]'
 }
