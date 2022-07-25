@@ -23,5 +23,5 @@ export const sign_in_page = {
     password_for_test: 'UserPassword',
     user_login_check: '.MuiTypography-subtitle1',
     confirmation_modal: '.MuiDialogContentText-root',
-    logout_button: '[data-test="sidenav-signout"]'
+    logout_button: '[data-test="sidenav-signout"]',
 }
