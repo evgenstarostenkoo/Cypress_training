@@ -1,6 +1,8 @@
 const { sign_in_page } = require("../selectors/sign_in_page");
 import { myRandomString } from "../../support/main_functions";
 const test_data = myRandomString();
+import { myRandomDigits } from "../../support/main_functions";
+const random_digits = myRandomDigits();
 
 describe("UI tests for sign in page", () => {
   before("visiting sign in page", () => {
@@ -63,11 +65,11 @@ describe("UI tests for sign in page", () => {
   });
 
   it("Should show disabled by default sign in btn", () => {
-    cy.get(sign_in_page.button).should("be.disabled");
+    cy.get(sign_in_page.sign_in_button).should("be.disabled");
   });
 
   it("should have 'Don't have an account? Sign Up' clickable link under 'Sign in' btn", () => {
-    cy.get(sign_in_page.button)
+    cy.get(sign_in_page.sign_in_button)
       .next()
       .should("have.text", "Don't have an account? Sign Up");
     cy.get(sign_in_page.signup_link)
@@ -109,11 +111,18 @@ describe("UI tests for sign in page", () => {
   it("should allow a newly created user to login", () => {
     cy.get(sign_in_page.user_name_input).type(test_data);
     cy.get(sign_in_page.password_input).type(sign_in_page.password_for_test);
-    cy.get(sign_in_page.button).click();
+    cy.get(sign_in_page.sign_in_button).click();
     cy.get(sign_in_page.confirmation_modal).should("be.visible");
+    cy.get(sign_in_page.onboarding_next_button).should("be.visible").click();
+    cy.get(sign_in_page.bank_name_input_field).type(test_data);
+    cy.get(sign_in_page.routing_name_input_field).type(random_digits);
+    cy.get(sign_in_page.acciount_number_input_field).type(random_digits);
+    cy.get(sign_in_page.onboarding_save_button).should("be.visible").click();
+    cy.get(sign_in_page.onboarding_next_button).should("be.visible").click();
+    cy.get(sign_in_page.user_login_check).should("contain", test_data);
   });
 
-  it("should allow a visitor to login", () => {
+  /* it("should allow a visitor to login", () => {
     cy.visit("/");
     cy.get(sign_in_page.user_name_input).type(sign_in_page.user_test_data);
     cy.get(sign_in_page.password_input).type(sign_in_page.password_for_test);
@@ -122,10 +131,93 @@ describe("UI tests for sign in page", () => {
       "contain",
       sign_in_page.user_test_data
     );
-  });
+  });*/ // doesn't work in long-distance. Seems that test project has user auto-deleting feature. Previously created users were deleted.
 
   it("should allow a visitor to logout", () => {
     cy.get(sign_in_page.logout_button).should("be.visible").click();
     cy.url().should("contain", "signin");
+  });
+
+  it("should display login errors", () => {
+    cy.get(sign_in_page.password_input).click();
+    cy.get(sign_in_page.user_helper_text)
+      .should("be.visible")
+      .and("have.text", "Username is required");
+    cy.get(sign_in_page.user_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+    cy.get(sign_in_page.password_input).type("1");
+    cy.get(sign_in_page.username).click();
+    cy.get(sign_in_page.password_helper_text)
+      .should("be.visible")
+      .and("have.text", "Password must contain at least 4 characters");
+    cy.get(sign_in_page.user_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+  });
+
+  it("should display signup errors", () => {
+    cy.get(sign_in_page.signup_link).click();
+    cy.get(sign_in_page.last_name).click();
+    cy.get(sign_in_page.first_name_helper_text)
+      .should("be.visible")
+      .and("have.text", "First Name is required");
+    cy.get(sign_in_page.first_name_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+    cy.get(sign_in_page.user_name_input).click();
+    cy.get(sign_in_page.last_name_helper_text)
+      .should("be.visible")
+      .and("have.text", "Last Name is required");
+    cy.get(sign_in_page.last_name_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+    cy.get(sign_in_page.user_password).click();
+    cy.get(sign_in_page.user_name_helper_text)
+      .should("be.visible")
+      .and("have.text", "Username is required");
+    cy.get(sign_in_page.user_name_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+    cy.get(sign_in_page.confirm_password).click();
+    cy.get(sign_in_page.password_helper_text)
+      .should("be.visible")
+      .and("have.text", "Enter your password");
+    cy.get(sign_in_page.password_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+    cy.get(sign_in_page.user_password).type("1");
+    cy.get(sign_in_page.password_helper_text)
+      .should("be.visible")
+      .and("have.text", "Password must contain at least 4 characters");
+    cy.get(sign_in_page.password_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+    cy.get(sign_in_page.first_name).click();
+    cy.get(sign_in_page.confirm_password_helper_text)
+      .should("be.visible")
+      .and("have.text", "Confirm your password");
+    cy.get(sign_in_page.confirm_password_helper_text)
+      .should("have.css", "color")
+      .and("eq", "rgb(244, 67, 54)");
+  });
+
+  it(" should error for an invalid user", () => {
+    cy.visit("/");
+    cy.get(sign_in_page.user_name_input).type(sign_in_page.user_test_data);
+    cy.get(sign_in_page.password_input).type(random_digits);
+    cy.get(sign_in_page.sign_in_button).click();
+    cy.get(sign_in_page.invalid_user_message)
+      .should("be.visible")
+      .and("have.text", "Username or password is invalid");
+  });
+
+  it("should error for an invalid password for existing user", () => {
+    cy.get(sign_in_page.user_name_input).type(test_data);
+    cy.get(sign_in_page.password_input).type(test_data);
+    cy.get(sign_in_page.sign_in_button).click();
+    cy.get(sign_in_page.invalid_user_message)
+      .should("be.visible")
+      .and("have.text", "Username or password is invalid");
   });
 });
